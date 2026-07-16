@@ -29,7 +29,11 @@ export function renderReport(
   const firstName = event.lead.firstName || 'there';
   const businessName = event.lead.businessName;
 
-  const subject = `${firstName}, your binding constraint is ${model.constraint.name}`;
+  const subjectTemplate =
+    config.terminology?.emailSubjectTemplate ?? '{first}, your binding constraint is {constraint}';
+  const subject = subjectTemplate
+    .replace('{first}', firstName)
+    .replace('{constraint}', model.constraint.name);
 
   const whyText = whyRuns(model, config, businessName)
     .map((r) => r.t)
@@ -38,15 +42,19 @@ export function renderReport(
     .map((r) => (r.b ? `<b>${escapeHtml(r.t)}</b>` : escapeHtml(r.t)))
     .join('');
 
+  const costPrefix = config.terminology?.costLinePrefix ?? 'Rough monthly cost of this zone:';
+  const costSuffix = config.terminology?.costLineSuffix ?? '';
+  const costAmount =
+    model.monthlyCost != null ? formatMonthlyCost(model.monthlyCost, currency)! : '';
   const costHtml =
     model.monthlyCost != null
-      ? `Rough monthly cost of this zone: <b style="color:${NAVY}">${escapeHtml(
-          formatMonthlyCost(model.monthlyCost, currency)!,
-        )}</b>`
+      ? `${costPrefix ? `${escapeHtml(costPrefix)} ` : ''}<b style="color:${NAVY}">${escapeHtml(
+          costAmount,
+        )}</b>${costSuffix ? ` ${escapeHtml(costSuffix)}` : ''}`
       : '';
   const costText =
     model.monthlyCost != null
-      ? `Rough monthly cost of this zone: ${formatMonthlyCost(model.monthlyCost, currency)}`
+      ? `${costPrefix ? `${costPrefix} ` : ''}${costAmount}${costSuffix ? ` ${costSuffix}` : ''}`
       : '';
 
   // Summary table rows.

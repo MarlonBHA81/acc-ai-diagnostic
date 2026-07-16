@@ -88,6 +88,32 @@ export interface NextStepCard {
   firmExample: string;
 }
 
+/**
+ * Per-vertical wording for the small amount of otherwise-shared chrome baked into
+ * the (industry-agnostic) results screen and report email. Every field is
+ * optional; an omitted field uses the generic default hard-coded in the consuming
+ * component, so a config that leaves `terminology` off behaves exactly as before.
+ */
+export interface Terminology {
+  /**
+   * Caption before the constraint cost calculation on the results screen and in
+   * the email. Default: "Rough monthly cost of this zone:". Set to "" to drop the
+   * caption (the accounting edition leads straight with the calculation).
+   */
+  costLinePrefix?: string;
+  /**
+   * Text appended after the constraint cost amount. Default: "" (none).
+   * Accounting uses "of billable-equivalent capacity".
+   */
+  costLineSuffix?: string;
+  /**
+   * Report email subject. `{first}` and `{constraint}` are substituted. Default:
+   * "{first}, your binding constraint is {constraint}". Accounting uses
+   * "{first}, your firm's binding constraint is {constraint}".
+   */
+  emailSubjectTemplate?: string;
+}
+
 export interface IndustryConfig {
   /** Route slug, e.g. "accounting". */
   slug: string;
@@ -121,6 +147,12 @@ export interface IndustryConfig {
 
   /** Next-step cards keyed to constraint AI level. */
   nextSteps: NextStepConfig;
+
+  /**
+   * Optional per-vertical wording for the shared results/email chrome. Omit to
+   * use the generic defaults (see Terminology).
+   */
+  terminology?: Terminology;
 
   /** Closing content on the results screen. */
   closing: {

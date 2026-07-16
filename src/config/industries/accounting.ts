@@ -182,6 +182,14 @@ export const accountingConfig: IndustryConfig = {
     },
   },
 
+  terminology: {
+    // The results/email cost line reads as billable-equivalent capacity:
+    // "{hours} hrs/wk × 4.33 × {rate} = {amount}/month of billable-equivalent capacity."
+    costLinePrefix: '',
+    costLineSuffix: 'of billable-equivalent capacity',
+    emailSubjectTemplate: "{first}, your firm's binding constraint is {constraint}",
+  },
+
   closing: {
     quote:
       'Identify the binding constraint. Apply AI to it with proper context and documentation. Verify that the constraint is solved. Identify the new constraint that has emerged. Repeat.',

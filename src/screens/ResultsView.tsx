@@ -36,6 +36,8 @@ export function ResultsView({
   const why = whyRuns(model, config, businessName);
   const partnerShort = config.dimensions.partnerInvolvementLabel.split(' ')[0];
   const bookingUrl = config.closing.ctaUrl;
+  const costPrefix = config.terminology?.costLinePrefix ?? 'Rough monthly cost of this zone:';
+  const costSuffix = config.terminology?.costLineSuffix ?? '';
 
   return (
     <div className="results">
@@ -73,9 +75,11 @@ export function ResultsView({
         <p className="cost-line" style={{ marginBottom: 0 }}>
           {model.monthlyCost != null ? (
             <>
-              Rough monthly cost of this zone: {fmtHours(model.constraint.hoursPerWeek)} hrs/wk ×
-              4.33 × {formatMoney(chargeOutRate ?? 0, currency)} ={' '}
+              {costPrefix ? `${costPrefix} ` : ''}
+              {fmtHours(model.constraint.hoursPerWeek)} hrs/wk × 4.33 ×{' '}
+              {formatMoney(chargeOutRate ?? 0, currency)} ={' '}
               <b>{formatMonthlyCost(model.monthlyCost, currency)}</b>
+              {costSuffix ? ` ${costSuffix}` : ''}
             </>
           ) : (
             <>Tip: add your charge-out rate on the baseline screen to see what this constraint costs per month.</>
