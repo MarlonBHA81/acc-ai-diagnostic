@@ -78,17 +78,19 @@ Easiest path, no CLI needed:
 Or via CLI: `npm i -g vercel && vercel` (first run links the project) then
 `vercel --prod`.
 
-> **Deploying the Accounting Firm Edition:** create a **second Vercel project from
-> this same repo** and set `VITE_VERTICAL=accounting` **and** `VERTICAL=accounting`
-> (plus the accounting site's own `LEAD_WEBHOOK_URL`, `APP_URL`, `ALLOWED_ORIGIN`,
-> etc). The generic edition is a separate project on the same repo with the vertical
-> vars unset. Both build from identical source.
+> **This repo is the dedicated Accounting Firm Edition deployment.** When importing
+> it into Vercel, set **`VITE_VERTICAL=accounting`** and **`VERTICAL=accounting`**
+> (Production + Preview). These two are required here so the frontend, the API, the
+> report email, and the PDF all render the accounting copy. (The generic edition
+> still lives in the same source and can be produced by leaving them unset — that's
+> how the unit tests exercise both — but this deployment always sets them to
+> `accounting`.)
 
-| Variable | Required | Purpose |
+| Variable | Required (accounting deploy) | Purpose |
 |---|---|---|
-| `VITE_VERTICAL` | no | Frontend edition: `accounting` \| `generic` (default). |
-| `VERTICAL` | no | Serverless edition: must match `VITE_VERTICAL`. |
-| `LEAD_WEBHOOK_URL` | yes | n8n webhook; receives both events. |
+| `VITE_VERTICAL` | **yes → `accounting`** | Frontend edition (Vite, inlined at build). |
+| `VERTICAL` | **yes → `accounting`** | Serverless edition (functions read at runtime; must match `VITE_VERTICAL`). |
+| `LEAD_WEBHOOK_URL` | yes | n8n webhook (the accounting workflow); receives both events. |
 | `EMAIL_API_KEY` | no | Resend API key. Report email skipped if unset. |
 | `EMAIL_FROM` | no | e.g. `diagnostics@storyadvantage.co`. Required to send email. |
 | `NOTIFY_EMAIL` | no | Internal "new lead" alert address. |
