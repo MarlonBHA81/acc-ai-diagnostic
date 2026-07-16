@@ -67,11 +67,13 @@ describe('accountingConfig — IndustryConfig contract', () => {
     }
   });
 
-  it('keeps the booking CTA and Simkin close', () => {
+  it('keeps the booking CTA and carries no Benjamin Simkin quote', () => {
     expect(accountingConfig.closing.ctaUrl).toBe(
       'https://link.storyadvantage.co.za/widget/bookings/ai-automations-debrief',
     );
-    expect(accountingConfig.closing.quoteAttribution).toContain('Simkin');
+    expect(accountingConfig.closing.quote).toBeUndefined();
+    expect(accountingConfig.closing.quoteAttribution).toBeUndefined();
+    expect(JSON.stringify(accountingConfig)).not.toMatch(/simkin/i);
   });
 });
 
@@ -162,11 +164,13 @@ describe('accounting terminology propagates into the report email', () => {
     expect(event.source).toBe('accounting-diagnostic');
   });
 
-  it('surfaces the accounting CTA, quote, and next-step firm example', () => {
+  it('surfaces the accounting CTA + firm example and carries no Simkin quote', () => {
     const r = renderReport(event, accountingConfig);
     expect(r.html).toContain(accountingConfig.closing.ctaText);
     expect(r.html).toContain(accountingConfig.closing.ctaUrl);
-    expect(r.html).toContain('Simkin');
+    // Benjamin Simkin's quote must be gone from the rendered report.
+    expect(r.html).not.toMatch(/simkin/i);
+    expect(r.text).not.toMatch(/simkin/i);
     // Client Delivery has no AI here → the "No AI usage" context-library card,
     // whose firm example is accounting-specific.
     expect(r.text).toContain(accountingConfig.nextSteps.contextLibrary.firmExample);

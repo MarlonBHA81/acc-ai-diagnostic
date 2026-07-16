@@ -2,10 +2,9 @@ import type { IndustryConfig } from '../IndustryConfig';
 
 /**
  * Generic Business Edition — the base vertical, ported verbatim from the
- * prototype (7zonediagnosticquiz). Zones, dimension options, next-step copy,
- * and the Simkin quote are exactly as in the prototype. The app's framework
- * additions (lead-capture gate, multi-currency, Story Advantage branding) wrap
- * this generic copy.
+ * prototype (7zonediagnosticquiz). Zones, dimension options, and next-step copy
+ * are exactly as in the prototype. The app's framework additions (lead-capture
+ * gate, multi-currency, Story Advantage branding) wrap this generic copy.
  */
 export const genericConfig: IndustryConfig = {
   slug: 'generic',
@@ -157,9 +156,7 @@ export const genericConfig: IndustryConfig = {
   },
 
   closing: {
-    quote:
-      'Identify the binding constraint. Apply AI to it with proper context and documentation. Verify that the constraint is solved. Identify the new constraint that has emerged. Repeat.',
-    quoteAttribution: 'Benjamin Simkin, The AI First Company',
+    // No pull-quote.
     reRunNote: 'Re-run this every 90 days and compare.',
     ctaText: 'Book your AI Automations Debrief',
     ctaUrl: 'https://link.storyadvantage.co.za/widget/bookings/ai-automations-debrief',

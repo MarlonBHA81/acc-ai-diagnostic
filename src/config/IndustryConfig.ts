@@ -112,6 +112,27 @@ export interface Terminology {
    * "{first}, your firm's binding constraint is {constraint}".
    */
   emailSubjectTemplate?: string;
+  /**
+   * The tip shown in place of the cost line when no charge-out rate was given.
+   * Default: "Tip: add your charge-out rate on the baseline screen to see what
+   * this constraint costs per month."
+   */
+  costLineTip?: string;
+}
+
+/**
+ * Per-vertical trailing sentences for the three "How the constraint was
+ * identified" synthesis cards on the results screen. Each is appended after the
+ * shared numeric lead-in (e.g. "30 hrs/week × repetitiveness 5 = 150."). Omitted
+ * fields use the generic defaults baked into the results screen.
+ */
+export interface SynthesisCopy {
+  /** After Test 1 (volume). Default: "This is where AI saves the most raw hours." */
+  volumeTail?: string;
+  /** After Test 2 (margin). Default: "Your biggest untapped opportunity." */
+  marginTail?: string;
+  /** After Test 3 (partner). Default: "Solving this frees your scarcest resource: leadership attention." */
+  partnerTail?: string;
 }
 
 export interface IndustryConfig {
@@ -154,11 +175,18 @@ export interface IndustryConfig {
    */
   terminology?: Terminology;
 
+  /**
+   * Optional per-vertical trailing sentences for the synthesis cards. Omit to use
+   * the generic defaults (see SynthesisCopy).
+   */
+  synthesis?: SynthesisCopy;
+
   /** Closing content on the results screen. */
   closing: {
-    /** Simkin quote shown on results. */
-    quote: string;
-    quoteAttribution: string;
+    /** Optional pull-quote shown on results + email. Omit to render no quote. */
+    quote?: string;
+    /** Attribution for the quote (only used when `quote` is set). */
+    quoteAttribution?: string;
     /** Re-run reminder line. */
     reRunNote: string;
     ctaText: string;

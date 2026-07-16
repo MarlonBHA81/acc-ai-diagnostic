@@ -318,6 +318,17 @@ keeps the original hard-coded defaults, so the generic edition is byte-identical
 Consumed by `src/screens/ResultsView.tsx` and `src/email/renderReport.ts`; both
 fall back to the generic strings when `terminology` (or a field) is absent.
 
+Two more per-vertical hooks work the same way (optional, generic-safe defaults):
+
+- **`synthesis`** — the trailing sentence on each of the three "How the constraint
+  was identified" cards. Accounting uses firm language ("hours are inventory";
+  "realization-critical zone without compressing it"; "partner attention — the
+  only hours that can sell advisory").
+- **`closing.quote` / `closing.quoteAttribution`** are now **optional**. The
+  accounting edition ships **no pull-quote** (the Benjamin Simkin quote has been
+  removed from the configs, the results screen, the email, and the standalone
+  email templates); a vertical that sets a quote still renders one.
+
 ## Testing
 
 - **Unit (`npm test`)** — 72 tests: scoring + tiebreaks + 1-1-1, currency in all

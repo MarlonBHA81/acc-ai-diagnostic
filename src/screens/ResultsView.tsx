@@ -38,6 +38,13 @@ export function ResultsView({
   const bookingUrl = config.closing.ctaUrl;
   const costPrefix = config.terminology?.costLinePrefix ?? 'Rough monthly cost of this zone:';
   const costSuffix = config.terminology?.costLineSuffix ?? '';
+  const costTip =
+    config.terminology?.costLineTip ??
+    'Tip: add your charge-out rate on the baseline screen to see what this constraint costs per month.';
+  const synVolumeTail = config.synthesis?.volumeTail ?? 'This is where AI saves the most raw hours.';
+  const synMarginTail = config.synthesis?.marginTail ?? 'Your biggest untapped opportunity.';
+  const synPartnerTail =
+    config.synthesis?.partnerTail ?? 'Solving this frees your scarcest resource: leadership attention.';
 
   return (
     <div className="results">
@@ -82,7 +89,7 @@ export function ResultsView({
               {costSuffix ? ` ${costSuffix}` : ''}
             </>
           ) : (
-            <>Tip: add your charge-out rate on the baseline screen to see what this constraint costs per month.</>
+            <>{costTip}</>
           )}
         </p>
       </div>
@@ -180,17 +187,17 @@ export function ResultsView({
         <SynItem
           k="Test 1 — Heaviest time + repetitiveness"
           zone={model.testWinners.volume.name}
-          r={`${fmtHours(model.testWinners.volume.hoursPerWeek)} hrs/week × repetitiveness ${model.testWinners.volume.repetitiveness} = ${model.testWinners.volume.timeRep}. This is where AI saves the most raw hours.`}
+          r={`${fmtHours(model.testWinners.volume.hoursPerWeek)} hrs/week × repetitiveness ${model.testWinners.volume.repetitiveness} = ${model.testWinners.volume.timeRep}. ${synVolumeTail}`}
         />
         <SynItem
           k="Test 2 — Highest margin impact, lowest AI usage"
           zone={model.testWinners.margin.name}
-          r={`${model.testWinners.margin.marginLabel} margin impact with ${model.testWinners.margin.aiLabel} AI usage. Your biggest untapped opportunity.`}
+          r={`${model.testWinners.margin.marginLabel} margin impact with ${model.testWinners.margin.aiLabel} AI usage. ${synMarginTail}`}
         />
         <SynItem
           k={`Test 3 — Highest ${config.dimensions.partnerInvolvementLabel.toLowerCase()}`}
           zone={model.testWinners.partner.name}
-          r={`${config.dimensions.partnerInvolvementLabel} ${model.testWinners.partner.partnerInvolvement}/5. Solving this frees your scarcest resource: leadership attention.`}
+          r={`${config.dimensions.partnerInvolvementLabel} ${model.testWinners.partner.partnerInvolvement}/5. ${synPartnerTail}`}
         />
       </div>
 
@@ -229,11 +236,15 @@ export function ResultsView({
         </>
       )}
 
-      {/* Quote */}
-      <p className="quote">
-        “{config.closing.quote}”
-        <span className="quote__who">— {config.closing.quoteAttribution}</span>
-      </p>
+      {/* Quote (optional) */}
+      {config.closing.quote && (
+        <p className="quote">
+          “{config.closing.quote}”
+          {config.closing.quoteAttribution && (
+            <span className="quote__who">— {config.closing.quoteAttribution}</span>
+          )}
+        </p>
+      )}
 
       {onRetake && (
         <div className="nav no-print">
