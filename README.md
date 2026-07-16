@@ -302,23 +302,21 @@ All vertical copy lives in `src/config/industries/*.ts` (`accounting.ts`,
 tokens, screens, PDF, and email are industry-agnostic — add a vertical by writing
 one config file and registering it in `active.ts`.
 
-**Two copy strings are intentionally shared (not per-vertical), because they live
-in industry-agnostic files** and changing them for accounting would alter the
-generic edition too (and break existing tests):
+**A small amount of otherwise-shared results/email chrome is config-driven** via an
+optional `terminology` block on `IndustryConfig`. Omitting it (as `generic` does)
+keeps the original hard-coded defaults, so the generic edition is byte-identical;
+`accounting` sets it to get firm-specific wording:
 
-- The results **cost line** reads *"Rough monthly cost of this zone: … hrs/wk ×
-  4.33 × rate = …"* (`src/screens/ResultsView.tsx`), not the accounting-specific
-  *"… of billable-equivalent capacity"* phrasing. The **numbers are identical**;
-  only the caption wording differs.
-- The report **email subject** is *"{First}, your binding constraint is
-  {Constraint}"* (`src/email/renderReport.ts`), not *"…your firm's binding
-  constraint…"*.
+- Results + email **cost line** — accounting reads *"… = {amount}/month of
+  billable-equivalent capacity"* (`terminology.costLinePrefix: ''`,
+  `costLineSuffix: 'of billable-equivalent capacity'`); generic keeps *"Rough
+  monthly cost of this zone: …"*. The **numbers are identical**; only wording differs.
+- Report **email subject** — accounting uses *"{First}, your firm's binding
+  constraint is {Constraint}"* (`terminology.emailSubjectTemplate`); generic keeps
+  *"{First}, your binding constraint is {Constraint}"*.
 
-  If the firm-specific wording is wanted, the clean fix is to add optional
-  `terminology` fields to `IndustryConfig` (e.g. `costLineCaption`,
-  `emailSubjectTemplate`) that default to the current strings for `generic` — a
-  small, config-driven change to two shared files. That was left out here to honour
-  the "leave the shared screens/PDF/email untouched" rule; flag if you want it in.
+Consumed by `src/screens/ResultsView.tsx` and `src/email/renderReport.ts`; both
+fall back to the generic strings when `terminology` (or a field) is absent.
 
 ## Testing
 
