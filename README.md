@@ -47,19 +47,21 @@ variable — nothing is forked or duplicated:
 | Frontend build (Vite) | `VITE_VERTICAL` | `accounting` \| `generic` |
 | Serverless functions (Vercel / Cloudflare) | `VERTICAL` | `accounting` \| `generic` |
 
-Unset (or `generic`) → the base Generic Business Edition. `accounting` → the
-Accounting Firm Edition. Any unknown value falls back to `generic` with a console
+**This repo defaults to `accounting`** (it is the dedicated Accounting Firm Edition
+deployment): with the vars unset, the frontend, API, email, and PDF all render the
+accounting copy. Set the vars to `generic` to produce the base Business Edition
+instead. Any unknown value falls back to the default (`accounting`) with a console
 warning. The selector lives in `src/config/active.ts`; because the app entry
 (`main.tsx`, `SharedResult.tsx`) **and** the `/api/lead` handler all import
 `activeConfig`, the on-screen results, the report email, and the PDF always switch
-together. Set **both** variables to the same value on a given deployment.
+together. When you do set them, set **both** to the same value.
 
 ```bash
-# run the accounting edition locally (set both so the API + PDF match the UI)
-VITE_VERTICAL=accounting VERTICAL=accounting npm run dev
-
-# run the generic edition (default — no env var needed)
+# run the accounting edition locally (default — no env var needed)
 npm run dev
+
+# run the generic edition
+VITE_VERTICAL=generic VERTICAL=generic npm run dev
 ```
 
 The route stays `/` for the app and `/r/:id` for shared results in both editions.
@@ -78,18 +80,19 @@ Easiest path, no CLI needed:
 Or via CLI: `npm i -g vercel && vercel` (first run links the project) then
 `vercel --prod`.
 
-> **This repo is the dedicated Accounting Firm Edition deployment.** When importing
-> it into Vercel, set **`VITE_VERTICAL=accounting`** and **`VERTICAL=accounting`**
-> (Production + Preview). These two are required here so the frontend, the API, the
-> report email, and the PDF all render the accounting copy. (The generic edition
-> still lives in the same source and can be produced by leaving them unset — that's
-> how the unit tests exercise both — but this deployment always sets them to
-> `accounting`.)
+> **This repo defaults to the Accounting Firm Edition** — importing it into Vercel
+> with **no vertical env vars** already ships accounting. You only need to set
+> `VITE_VERTICAL` / `VERTICAL` if you want to be explicit, or set them to `generic`
+> to run the base Business Edition from the same source.
+>
+> ⚠️ If your Vercel deployment shows the **"Business Edition"** masthead, an earlier
+> build pinned `VITE_VERTICAL=generic` (or built before this default landed) —
+> redeploy; unset vars now yield accounting.
 
 | Variable | Required (accounting deploy) | Purpose |
 |---|---|---|
-| `VITE_VERTICAL` | **yes → `accounting`** | Frontend edition (Vite, inlined at build). |
-| `VERTICAL` | **yes → `accounting`** | Serverless edition (functions read at runtime; must match `VITE_VERTICAL`). |
+| `VITE_VERTICAL` | no — defaults to `accounting` | Frontend edition (Vite, inlined at build). Set `generic` for the Business Edition. |
+| `VERTICAL` | no — defaults to `accounting` | Serverless edition (functions read at runtime; keep it matching `VITE_VERTICAL`). |
 | `LEAD_WEBHOOK_URL` | yes | n8n webhook (the accounting workflow); receives both events. |
 | `EMAIL_API_KEY` | no | Resend API key. Report email skipped if unset. |
 | `EMAIL_FROM` | no | e.g. `diagnostics@storyadvantage.co`. Required to send email. |

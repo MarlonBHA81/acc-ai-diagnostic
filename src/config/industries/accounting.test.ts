@@ -93,20 +93,27 @@ describe('active.ts — env-selectable vertical (server / process.env.VERTICAL)'
     expect(activeConfig.sourceTag).toBe('accounting-diagnostic');
   });
 
-  it('defaults to the generic edition when no vertical is set', async () => {
+  it('defaults to the accounting edition when no vertical is set (this repo is accounting-only)', async () => {
     vi.resetModules();
     vi.stubEnv('VERTICAL', '');
+    const { activeConfig } = await import('../active');
+    expect(activeConfig.slug).toBe('accounting');
+  });
+
+  it('still resolves the generic edition when explicitly set to generic', async () => {
+    vi.resetModules();
+    vi.stubEnv('VERTICAL', 'generic');
     const { activeConfig } = await import('../active');
     expect(activeConfig.slug).toBe('generic');
     expect(activeConfig.sourceTag).toBe(genericConfig.sourceTag);
   });
 
-  it('falls back to generic (with a warning) on an unknown vertical', async () => {
+  it('falls back to the default (accounting) with a warning on an unknown vertical', async () => {
     vi.resetModules();
     vi.stubEnv('VERTICAL', 'nope-not-a-vertical');
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const { activeConfig } = await import('../active');
-    expect(activeConfig.slug).toBe('generic');
+    expect(activeConfig.slug).toBe('accounting');
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
   });

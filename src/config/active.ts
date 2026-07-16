@@ -6,15 +6,21 @@
  *   - Serverless (Vercel /    process.env.VERTICAL
  *     Cloudflare functions)
  *
- * Unset (or "generic") resolves to the base Generic Business Edition; "accounting"
- * resolves to the Accounting Firm Edition. Any unknown value falls back to
- * `generic` with a console warning. This module is imported by both the app entry
- * (main.tsx, SharedResult.tsx) and the /api/lead handler (handleLead.ts), so the
- * on-screen results, the report email, and the PDF always use the same copy.
+ * THIS REPO IS THE DEDICATED ACCOUNTING FIRM EDITION, so the default vertical is
+ * `accounting`: with no env var set, the frontend, API, email, and PDF all render
+ * the accounting copy. That means a Vercel project built off this repo ships the
+ * accounting edition out of the box — no configuration required. The generic
+ * edition is still reachable from the same source by setting the vars to
+ * "generic" (that's how the unit tests exercise both). Any unknown value falls
+ * back to the default with a console warning.
+ *
+ * This module is imported by both the app entry (main.tsx, SharedResult.tsx) and
+ * the /api/lead handler (handleLead.ts), so the on-screen results, the report
+ * email, and the PDF always use the same copy.
  *
  * Available verticals:
- *   - genericConfig     (Generic Business Edition — the base prototype)
- *   - accountingConfig  (Accounting Firm Edition)
+ *   - accountingConfig  (Accounting Firm Edition — this repo's default)
+ *   - genericConfig     (Generic Business Edition — set VITE_VERTICAL/VERTICAL=generic)
  */
 import type { IndustryConfig } from './IndustryConfig';
 import { genericConfig } from './industries/generic';
@@ -26,7 +32,9 @@ const VERTICALS: Record<string, IndustryConfig> = {
   accounting: accountingConfig,
 };
 
-const DEFAULT_VERTICAL = 'generic';
+// This repo is the dedicated Accounting Firm Edition deployment, so an unset /
+// unknown vertical resolves to accounting (not generic). See the module doc above.
+const DEFAULT_VERTICAL = 'accounting';
 
 /**
  * Read the requested vertical from whichever environment is available. In the
