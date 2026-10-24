@@ -41,9 +41,13 @@ function readRequestedVertical(): string | undefined {
   } catch {
     /* not a Vite context */
   }
-  if (typeof process !== 'undefined' && process.env && process.env.VERTICAL) {
-    return process.env.VERTICAL;
-  }
+  // Read process.env without referencing the bare `process` global (which isn't
+  // in this project's TS `types` allowlist); works in Node/serverless, undefined
+  // in the browser.
+  const g = globalThis as unknown as { process?: { env?: Record<string, string | undefined> } };
+  const fromNode = g.process?.env?.VERTICAL;
+  if (fromNode) return fromNode;
+
   return undefined;
 }
 
