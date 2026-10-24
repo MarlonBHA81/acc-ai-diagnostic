@@ -45,7 +45,7 @@ export function ZoneScreen({ index }: { index: number }) {
     }
 
     track('zone_completed', { zone: zone.id });
-    if (isLast) go('results');
+    if (isLast) go('details');
     else go(index + 1);
   }
 
@@ -61,7 +61,7 @@ export function ZoneScreen({ index }: { index: number }) {
       <p className="zone-desc">{zone.description}</p>
       <p className="think">{zone.thinkExample}</p>
 
-      {/* 1 — Hours */}
+      {/* 1, Hours */}
       <div className={cls('hours')} data-q="hours">
         <div className="qblock__label">{dims.hoursLabel}</div>
         <div className="qblock__hint">{dims.hoursHint}</div>
@@ -84,7 +84,7 @@ export function ZoneScreen({ index }: { index: number }) {
         </div>
       </div>
 
-      {/* 2 — Repetitiveness */}
+      {/* 2, Repetitiveness */}
       <div className={cls('rep')} data-q="rep">
         <div className="qblock__label">{dims.repetitivenessLabel}</div>
         <div className="qblock__hint">{dims.repetitivenessHint}</div>
@@ -99,7 +99,7 @@ export function ZoneScreen({ index }: { index: number }) {
         />
       </div>
 
-      {/* 3 — AI usage */}
+      {/* 3, AI usage */}
       <div className={cls('ai')} data-q="ai">
         <div className="qblock__label">{dims.aiUsageLabel}</div>
         <div className="qblock__hint">{dims.aiUsageHint}</div>
@@ -119,7 +119,7 @@ export function ZoneScreen({ index }: { index: number }) {
         </div>
       </div>
 
-      {/* 4 — Margin impact */}
+      {/* 4, Margin impact */}
       <div className={cls('margin')} data-q="margin">
         <div className="qblock__label">{dims.marginImpactLabel}</div>
         <div className="qblock__hint">{dims.marginImpactHint}</div>
@@ -139,7 +139,7 @@ export function ZoneScreen({ index }: { index: number }) {
         </div>
       </div>
 
-      {/* 5 — Partner involvement */}
+      {/* 5, Partner involvement */}
       <div className={cls('own')} data-q="own">
         <div className="qblock__label">{dims.partnerInvolvementLabel}</div>
         <div className="qblock__hint">{dims.partnerInvolvementHint}</div>
@@ -180,7 +180,7 @@ export function ZoneScreen({ index }: { index: number }) {
           ← Back
         </button>
         <button className="btn btn--primary" type="button" onClick={handleNext}>
-          {isLast ? 'See my results →' : 'Next zone →'}
+          {isLast ? 'Get my report →' : 'Next zone →'}
         </button>
       </div>
     </div>

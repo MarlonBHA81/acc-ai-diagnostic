@@ -1,18 +1,27 @@
 # The 7-Zone Business Diagnostic — Accounting Firm Edition
 
 A **Story Advantage** lead-generating diagnostic quiz. Accounting-firm partners
-enter their details **up front**, score their firm across 7 zones × 5 dimensions,
-and get their **binding constraint** — the one bottleneck AI should fix first —
-plus a results dashboard and an emailed report. Even an abandoned quiz produces a
-usable lead, because contact details are captured before the questions start.
+score their firm across 7 zones × 5 dimensions and get their **binding
+constraint** — the one bottleneck AI should fix first — plus a results dashboard
+and an emailed report.
 
-Built from the source-of-truth prototype (`7zonediagnosticquiz`) with two
-deliberate changes: **lead capture moved to the start**, and **all money fields
-made multi-currency**. Brand styling is Story Advantage's, from the brand manual.
+**This repo is the dedicated Accounting Firm Edition.** It is the *same* codebase
+as the generic 7-Zone Business Diagnostic (one repo → both editions, chosen by env
+var) but **defaults to accounting**: accounting copy, firm terminology, and the
+accounting "ledger" theme (warm paper, ledger-green accent, signal-red constraint,
+monospace labels) in `src/styles/theme-accounting.css`, scoped to
+`[data-vertical="accounting"]` so the generic edition is untouched. No Benjamin
+Simkin quote.
+
+Flow (lead captured **after** the quiz, so the report is the reward):
 
 ```
-Welcome + Details (the gate) → Firm Baseline → Zone 1 … Zone 7 → Results
+Welcome → Firm Baseline → Zone 1 … Zone 7 → Your details → Results
 ```
+
+A faster **Quick Mode** (3 taps per zone) ships too; this edition runs the **full**
+diagnostic by default (`activeMode` in `src/config/active.ts`). PDFs are generated
+with `pdf-lib` (no headless Chromium); `/r/:id` is served via an SPA rewrite.
 
 ## Stack
 
@@ -36,35 +45,23 @@ npm run build      # tsc + vite build → dist/
 npm run typecheck
 ```
 
-### Which edition runs (one codebase → both editions)
+### Editions & theme (one codebase → both)
 
-This is a single codebase that produces **both** the Generic Business Edition and
-the Accounting Firm Edition. The active vertical is chosen by an environment
-variable — nothing is forked or duplicated:
+The active vertical is chosen by env var; this repo **defaults to `accounting`**:
 
 | Context | Variable | Values |
 |---|---|---|
-| Frontend build (Vite) | `VITE_VERTICAL` | `accounting` \| `generic` |
-| Serverless functions (Vercel / Cloudflare) | `VERTICAL` | `accounting` \| `generic` |
+| Frontend (Vite) | `VITE_VERTICAL` | unset/`accounting` (default) · `generic` |
+| Serverless (Vercel/CF) | `VERTICAL` | unset/`accounting` (default) · `generic` |
 
-**This repo defaults to `accounting`** (it is the dedicated Accounting Firm Edition
-deployment): with the vars unset, the frontend, API, email, and PDF all render the
-accounting copy. Set the vars to `generic` to produce the base Business Edition
-instead. Any unknown value falls back to the default (`accounting`) with a console
-warning. The selector lives in `src/config/active.ts`; because the app entry
-(`main.tsx`, `SharedResult.tsx`) **and** the `/api/lead` handler all import
-`activeConfig`, the on-screen results, the report email, and the PDF always switch
-together. When you do set them, set **both** to the same value.
+`src/config/active.ts` resolves `activeConfig` from these (unknown → accounting +
+console warning). `src/main.tsx` sets `data-vertical` on `<html>`, which activates
+the scoped theme in `src/styles/theme-accounting.css`. Run the generic Business
+Edition locally with `VITE_VERTICAL=generic VERTICAL=generic npm run dev`.
 
-```bash
-# run the accounting edition locally (default — no env var needed)
-npm run dev
-
-# run the generic edition
-VITE_VERTICAL=generic VERTICAL=generic npm run dev
-```
-
-The route stays `/` for the app and `/r/:id` for shared results in both editions.
+> ⚠️ If a deployment shows the navy **"Business Edition"**, it was built with
+> `VITE_VERTICAL=generic` (or pinned before this default landed) — unset it and
+> redeploy; the default is now accounting.
 
 ## Deploy (Vercel — primary)
 
@@ -80,20 +77,9 @@ Easiest path, no CLI needed:
 Or via CLI: `npm i -g vercel && vercel` (first run links the project) then
 `vercel --prod`.
 
-> **This repo defaults to the Accounting Firm Edition** — importing it into Vercel
-> with **no vertical env vars** already ships accounting. You only need to set
-> `VITE_VERTICAL` / `VERTICAL` if you want to be explicit, or set them to `generic`
-> to run the base Business Edition from the same source.
->
-> ⚠️ If your Vercel deployment shows the **"Business Edition"** masthead, an earlier
-> build pinned `VITE_VERTICAL=generic` (or built before this default landed) —
-> redeploy; unset vars now yield accounting.
-
-| Variable | Required (accounting deploy) | Purpose |
+| Variable | Required | Purpose |
 |---|---|---|
-| `VITE_VERTICAL` | no — defaults to `accounting` | Frontend edition (Vite, inlined at build). Set `generic` for the Business Edition. |
-| `VERTICAL` | no — defaults to `accounting` | Serverless edition (functions read at runtime; keep it matching `VITE_VERTICAL`). |
-| `LEAD_WEBHOOK_URL` | yes | n8n webhook (the accounting workflow); receives both events. |
+| `LEAD_WEBHOOK_URL` | yes | n8n webhook; receives both events. |
 | `EMAIL_API_KEY` | no | Resend API key. Report email skipped if unset. |
 | `EMAIL_FROM` | no | e.g. `diagnostics@storyadvantage.co`. Required to send email. |
 | `NOTIFY_EMAIL` | no | Internal "new lead" alert address. |
@@ -134,19 +120,6 @@ alter table public.diagnostics enable row level security;
 The `/api/result?id=<uuid>` function reads a row with the service-role key
 server-side, so the key is never exposed and the anon client can't query the
 table directly.
-
-### Supabase decision: one project, shared table + bucket
-
-**The accounting and generic editions reuse the same `diagnostics` table and the
-same `reports` Storage bucket** — one Supabase project serves both. Every row (and
-every webhook payload) already carries a `source` field from the active config's
-`sourceTag` (`accounting-diagnostic` vs `business-diagnostic`), so the two editions
-filter cleanly with `where source = 'accounting-diagnostic'`. This keeps
-operations simple (one schema, one bucket, one set of keys) and lets you report
-across editions when you want to. If you later need hard data isolation (separate
-billing, separate RLS, compliance), point the accounting project at its own
-`SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` — no code changes are required, since
-those are per-deployment env vars.
 
 ## Downloadable PDF
 
@@ -299,50 +272,16 @@ otherwise.
 
 ## Industry templating
 
-All vertical copy lives in `src/config/industries/*.ts` (`accounting.ts`,
-`generic.ts`), typed against `src/config/IndustryConfig.ts`, and selected by
-`src/config/active.ts` from `VITE_VERTICAL` / `VERTICAL`. The scoring engine, brand
-tokens, screens, PDF, and email are industry-agnostic — add a vertical by writing
-one config file and registering it in `active.ts`.
-
-**A small amount of otherwise-shared results/email chrome is config-driven** via an
-optional `terminology` block on `IndustryConfig`. Omitting it (as `generic` does)
-keeps the original hard-coded defaults, so the generic edition is byte-identical;
-`accounting` sets it to get firm-specific wording:
-
-- Results + email **cost line** — accounting reads *"… = {amount}/month of
-  billable-equivalent capacity"* (`terminology.costLinePrefix: ''`,
-  `costLineSuffix: 'of billable-equivalent capacity'`); generic keeps *"Rough
-  monthly cost of this zone: …"*. The **numbers are identical**; only wording differs.
-- Report **email subject** — accounting uses *"{First}, your firm's binding
-  constraint is {Constraint}"* (`terminology.emailSubjectTemplate`); generic keeps
-  *"{First}, your binding constraint is {Constraint}"*.
-
-Consumed by `src/screens/ResultsView.tsx` and `src/email/renderReport.ts`; both
-fall back to the generic strings when `terminology` (or a field) is absent.
-
-Two more per-vertical hooks work the same way (optional, generic-safe defaults):
-
-- **`synthesis`** — the trailing sentence on each of the three "How the constraint
-  was identified" cards. Accounting uses firm language ("hours are inventory";
-  "realization-critical zone without compressing it"; "partner attention — the
-  only hours that can sell advisory").
-- **`closing.quote` / `closing.quoteAttribution`** are now **optional**. The
-  accounting edition ships **no pull-quote** (the Benjamin Simkin quote has been
-  removed from the configs, the results screen, the email, and the standalone
-  email templates); a vertical that sets a quote still renders one.
+All accounting copy lives in `src/config/industries/accounting.ts`, typed against
+`src/config/IndustryConfig.ts`. The scoring engine and brand tokens are
+industry-agnostic — add a vertical by writing one config file.
 
 ## Testing
 
-- **Unit (`npm test`)** — 72 tests: scoring + tiebreaks + 1-1-1, currency in all
+- **Unit (`npm test`)** — 61 tests: scoring + tiebreaks + 1-1-1, currency in all
   four currencies, ZA (+27) mobile, email rendering + XSS, the `/api/lead`
-  handler (honeypot, invalid email, <60s, CORS, webhook-fail), the Supabase
-  Storage helpers (`pdfStorage`), and the Accounting Firm Edition
-  (`src/config/industries/accounting.test.ts`: config satisfies `IndustryConfig`,
-  env-selectable `active.ts` resolves accounting via `VERTICAL` and falls back to
-  generic on unknown/unset, and the `accounting-diagnostic` sourceTag + "Partner
-  involvement" terminology propagate into the payload, results table header, and
-  report email).
+  handler (honeypot, invalid email, <60s, CORS, webhook-fail), and the Supabase
+  Storage helpers (`pdfStorage`).
 - **App locally (`npm run dev`)** — run the quiz; the results page's client-side
   Download PDF works without any backend.
 - **PDF render smoke test (`npm run smoke:pdf`)** — serves the built app + a mock

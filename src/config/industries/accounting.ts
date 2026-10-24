@@ -1,13 +1,15 @@
 import type { IndustryConfig } from '../IndustryConfig';
 
 /**
- * Accounting Firm Edition — vertical #1 (route: /accounting).
+ * Accounting Firm Edition: vertical #1, and the default for this repo.
  *
  * Copy is ported from the source-of-truth prototype worksheet
- * (`7-zone-diagnostic-accounting-firm.html`). Structure, scoring, results layout,
- * dimension options, and next-step logic are shared/industry-agnostic; only this
- * vertical copy differs. The two deliberate framework changes from the prototype
- * (lead capture up front; multi-currency) live elsewhere in the app.
+ * (7-zone-diagnostic-accounting-firm.html), tightened to the Story Advantage
+ * house style (plain, direct, no em/en dashes, no hype). Structure, scoring,
+ * results layout, dimension options, and next-step logic are shared and
+ * industry-agnostic; only this vertical copy (and the accounting theme in
+ * src/styles/theme-accounting.css) differs. No pull-quote (the Benjamin Simkin
+ * quote has been removed from the product).
  */
 export const accountingConfig: IndustryConfig = {
   slug: 'accounting',
@@ -17,7 +19,7 @@ export const accountingConfig: IndustryConfig = {
   welcome: {
     headline: 'Where should AI go **first** in your firm?',
     subhead:
-      "Score the seven zones of your practice — from lead generation through to your own partner time — across five dimensions. The math will point at your binding constraint: the one bottleneck limiting the whole firm. Score what's actually happening, not what the website says. Roughly 10–15 minutes.",
+      "Score the seven zones of your practice, from lead generation through to your own partner time, across five dimensions. The math points to your binding constraint: the one bottleneck limiting the whole firm. Score what's actually happening, not what the website says. Roughly 10 to 15 minutes.",
   },
 
   baseline: {
@@ -25,7 +27,7 @@ export const accountingConfig: IndustryConfig = {
     teamSizeLabel: 'Team size (partners + staff)',
     chargeOutRateLabel: 'Blended charge-out rate',
     chargeOutRateNote:
-      'Optional — used to price your constraint in lost billable capacity per month.',
+      'Optional. Used to price your constraint in lost billable capacity per month.',
     busySeasonNote:
       "For hours-per-week questions, use a realistic annual average. If tax season doubles a zone's load for 3 months, weight it in rather than scoring your quietest week.",
   },
@@ -33,7 +35,7 @@ export const accountingConfig: IndustryConfig = {
   dimensions: {
     hoursLabel: 'Time consumed',
     hoursHint:
-      'Total hours per week the firm (partners + staff) spends in this zone, averaged across the year — weight busy season in. A real number, not “a lot”.',
+      'Total hours per week the firm (partners + staff) spends in this zone, averaged across the year, with busy season weighted in. A real number, not “a lot”.',
 
     repetitivenessLabel: 'Repetitiveness',
     repetitivenessHint:
@@ -42,21 +44,21 @@ export const accountingConfig: IndustryConfig = {
 
     aiUsageLabel: 'Current AI usage',
     aiUsageHint:
-      "Be honest — a Copilot licence nobody uses doesn't count, and OCR in your tax software from 2015 isn't AI-first.",
+      "Be honest: a Copilot licence nobody uses doesn't count, and OCR in your tax software from 2015 isn't AI-first.",
     aiUsageOptions: [
       { value: 1, label: 'None', description: 'No AI tools or systems in this zone.' },
-      { value: 2, label: 'Basic', description: 'Occasional tasks — e.g. ChatGPT for client emails or memo drafts.' },
-      { value: 3, label: 'Moderate', description: 'Integrated into regular workflows — saving measurable hours (e.g. AI coding transactions, drafting workpapers).' },
-      { value: 4, label: 'Advanced', description: 'Load-bearing — the process was redesigned around AI, humans review exceptions.' },
+      { value: 2, label: 'Basic', description: 'Occasional tasks, e.g. ChatGPT for client emails or memo drafts.' },
+      { value: 3, label: 'Moderate', description: 'Integrated into regular workflows, saving measurable hours (e.g. AI coding transactions, drafting workpapers).' },
+      { value: 4, label: 'Advanced', description: 'Load-bearing: the process was redesigned around AI, humans review exceptions.' },
     ],
 
     marginImpactLabel: 'Margin impact',
     marginImpactHint:
-      "How much does this zone affect the firm's profitability — realization, recovery, write-offs, capacity?",
+      "How much does this zone affect the firm's profitability: realization, recovery, write-offs, capacity?",
     marginImpactOptions: [
       { value: 1, label: 'Low', description: 'Minimal effect on firm profitability.' },
       { value: 2, label: 'Medium', description: 'Improvements would noticeably lift recovery or margin.' },
-      { value: 3, label: 'High', description: "Directly drives margin — changes here move the firm's P&L." },
+      { value: 3, label: 'High', description: "Directly drives margin: changes here move the firm's P&L." },
       { value: 4, label: 'Critical', description: 'This is where realization and margin live or die.' },
     ],
 
@@ -66,16 +68,27 @@ export const accountingConfig: IndustryConfig = {
     partnerInvolvementCaps: ['Never', '', 'Shared', '', "I'm the bottleneck"],
   },
 
+  quick: {
+    instruction: 'Three quick taps. Answer for how the firm actually works today.',
+    questions: {
+      repetitive: 'Is most of the {zone} work repetitive or rule-based?',
+      time: 'Does {zone} eat a lot of the firm’s time each week?',
+      aiUsage: 'Are you already using AI for {zone} in a real way?',
+    },
+    hoursPrompt: 'Roughly how many hours a week does the firm spend on {zone}?',
+    hoursBands: ['Under 5 hours', '5 to 15 hours', '15+ hours'],
+  },
+
   zones: [
     {
       id: 'lead',
       name: 'Lead Generation',
       description:
-        'How new clients find the firm — referrals, professional networks, content, seminars, directories, local presence.',
+        'How new clients find the firm: referrals, professional networks, content, seminars, directories, local presence.',
       thinkExample:
-        'Think: referral partner nurturing, LinkedIn/newsletter content, tax-deadline campaigns, webinars, Google reviews.',
+        'Think: referral partner nurturing, LinkedIn and newsletter content, tax-deadline campaigns, webinars, Google reviews.',
       freeText: [
-        { key: 'bottleneck', label: "What's the biggest bottleneck in this zone?", placeholder: 'e.g. We rely almost entirely on referrals — no system generates leads without a partner networking…' },
+        { key: 'bottleneck', label: "What's the biggest bottleneck in this zone?", placeholder: 'e.g. We rely almost entirely on referrals; no system generates leads without a partner networking…' },
         { key: 'desiredFix', label: 'If you could fix one thing here with AI, what would it be?', placeholder: 'e.g. A monthly client newsletter and tax-update content that goes out without a partner writing it…' },
       ],
     },
@@ -83,7 +96,7 @@ export const accountingConfig: IndustryConfig = {
       id: 'sales',
       name: 'Sales & Onboarding',
       description:
-        'How enquiries become engaged clients — discovery calls, scoping, pricing, proposals, engagement letters, onboarding.',
+        'How enquiries become engaged clients: discovery calls, scoping, pricing, proposals, engagement letters, onboarding.',
       thinkExample:
         'Think: fee quoting, proposal drafting, engagement letters, AML/KYC checks, collecting prior-year records and logins.',
       freeText: [
@@ -95,11 +108,11 @@ export const accountingConfig: IndustryConfig = {
       id: 'delivery',
       name: 'Client Delivery',
       description:
-        'The billable work itself — tax returns, bookkeeping, month-end close, financial statements, audits, advisory.',
+        'The billable work itself: tax returns, bookkeeping, month-end close, financial statements, audits, advisory.',
       thinkExample:
         'Think: data entry and coding, workpaper prep, reconciliations, return preparation, review notes, client queries.',
       freeText: [
-        { key: 'bottleneck', label: "What's the biggest bottleneck in this zone?", placeholder: 'e.g. Juniors prepare, but everything bottlenecks at manager/partner review — review notes go back and forth for days…' },
+        { key: 'bottleneck', label: "What's the biggest bottleneck in this zone?", placeholder: 'e.g. Juniors prepare, but everything bottlenecks at manager/partner review; review notes go back and forth for days…' },
         { key: 'desiredFix', label: 'If you could fix one thing here with AI, what would it be?', placeholder: 'e.g. First-pass workpapers, transaction coding, and draft client query lists produced by AI before a human touches the file…' },
       ],
     },
@@ -107,9 +120,9 @@ export const accountingConfig: IndustryConfig = {
       id: 'ops',
       name: 'Operations',
       description:
-        'The machinery around the billable work — workflow and deadline tracking, document chasing, internal comms, scheduling, admin.',
+        'The machinery around the billable work: workflow and deadline tracking, document chasing, internal comms, scheduling, admin.',
       thinkExample:
-        'Think: job status tracking, deadline lists (tax/filing calendars), chasing clients for documents, meeting scheduling, email triage.',
+        'Think: job status tracking, deadline lists (tax and filing calendars), chasing clients for documents, meeting scheduling, email triage.',
       freeText: [
         { key: 'bottleneck', label: "What's the biggest bottleneck in this zone?", placeholder: 'e.g. Half our admin time is chasing clients for missing documents and updating job statuses manually…' },
         { key: 'desiredFix', label: 'If you could fix one thing here with AI, what would it be?', placeholder: 'e.g. Automated document chasing with escalation, and job statuses that update themselves from our practice software…' },
@@ -119,7 +132,7 @@ export const accountingConfig: IndustryConfig = {
       id: 'finance',
       name: 'Firm Finance',
       description:
-        "The firm's own money — WIP, billing, debtors, realization and recovery rates, forecasting. (The cobbler's children's shoes.)",
+        "The firm's own money: WIP, billing, debtors, realization and recovery rates, forecasting. (The cobbler's children's shoes.)",
       thinkExample:
         'Think: WIP write-offs, invoicing lag, AR chasing, partner realization reports, cash-flow forecasting for the firm itself.',
       freeText: [
@@ -143,7 +156,7 @@ export const accountingConfig: IndustryConfig = {
       id: 'owner',
       name: 'Partner / Owner',
       description:
-        'Your own time — strategy, pricing, firm direction, advisory relationships. The thinking work only you can do.',
+        'Your own time: strategy, pricing, firm direction, advisory relationships. The thinking work only you can do.',
       thinkExample:
         'Think: how much of your week is final review, client firefighting, and admin vs. actual firm architecture and high-value advisory.',
       freeText: [
@@ -158,23 +171,23 @@ export const accountingConfig: IndustryConfig = {
       heading: 'No AI usage in this zone',
       body: 'Build your context library first (Context Library Blueprint), then deploy AI to the highest-volume repetitive task in this zone. Then run the Constraint Identification worksheet to validate and dollarise the bottleneck, followed by the Buy / Build / Wait matrix before subscribing to anything.',
       firmExample:
-        'For a firm, the context library means: your engagement letter templates, standard fee schedule, firm tone-of-voice for client emails, common client query answers, and your review checklist — the documents that make AI output sound like your firm, not a chatbot.',
+        'For a firm, the context library means your engagement letter templates, standard fee schedule, firm tone-of-voice for client emails, common client query answers, and your review checklist: the documents that make AI output sound like your firm, not a chatbot.',
     },
     redesign: {
       heading: 'Basic AI usage in this zone',
-      body: 'You\'ve added tools but haven\'t redesigned the workflow. Ask: “If we were building this part of the practice today, from scratch, with the tools that now exist — would it look like this?” Then redesign it — don\'t just speed up the old process. Then run the Constraint Identification worksheet to validate and dollarise the bottleneck, followed by the Buy / Build / Wait matrix before subscribing to anything.',
+      body: 'You\'ve added tools but haven\'t redesigned the workflow. Ask: “If we were building this part of the practice today, from scratch, with the tools that now exist, would it look like this?” Then redesign it. Don\'t just speed up the old process. Then run the Constraint Identification worksheet to validate and dollarise the bottleneck, followed by the Buy / Build / Wait matrix before subscribing to anything.',
       firmExample:
-        'Retrofit: staff use ChatGPT to draft client emails faster. Redesign: client queries are answered from a firm knowledge base with a human approving exceptions, and the prep→review loop is rebuilt so partners see one clean pass instead of three messy ones.',
+        'Retrofit: staff use ChatGPT to draft client emails faster. Redesign: client queries are answered from a firm knowledge base with a human approving exceptions, and the prep and review loop is rebuilt so partners see one clean pass instead of three messy ones.',
     },
     integrate: {
       heading: 'Moderate AI usage in this zone',
-      body: "You're partway there. The next step is integration — connect this zone's AI systems to the rest of the practice so data flows and compounds. Then run the Constraint Identification worksheet to validate and dollarise the bottleneck, followed by the Buy / Build / Wait matrix before subscribing to anything.",
+      body: "You're partway there. The next step is integration: connect this zone's AI systems to the rest of the practice so data flows and compounds. Then run the Constraint Identification worksheet to validate and dollarise the bottleneck, followed by the Buy / Build / Wait matrix before subscribing to anything.",
       firmExample:
-        'Example: your AI transaction coding should feed the workpapers, which feed the draft financials, which feed the client letter and the WIP/billing system — one flow, not four disconnected tools.',
+        'Example: your AI transaction coding should feed the workpapers, which feed the draft financials, which feed the client letter and the WIP and billing system. One flow, not four disconnected tools.',
     },
     constraintShifted: {
       heading: 'Advanced AI usage in this zone',
-      body: 'This zone is already AI-first — your binding constraint has shifted. Repeat the process on your next-highest scoring zone. Then run the Constraint Identification worksheet to validate and dollarise the bottleneck, followed by the Buy / Build / Wait matrix before subscribing to anything.',
+      body: 'This zone is already AI-first, so your binding constraint has shifted. Repeat the process on your next-highest scoring zone. Then run the Constraint Identification worksheet to validate and dollarise the bottleneck, followed by the Buy / Build / Wait matrix before subscribing to anything.',
       firmExample: '',
     },
   },
@@ -191,15 +204,15 @@ export const accountingConfig: IndustryConfig = {
   },
 
   synthesis: {
-    volumeTail: 'This is where AI recovers the most raw hours — and in a firm, hours are inventory.',
+    volumeTail: 'This is where AI recovers the most raw hours, and in a firm, hours are inventory.',
     marginTail: "You're spending in a realization-critical zone without compressing it.",
     partnerTail:
-      'Solving this frees the scarcest resource in the firm: partner attention — the only hours that can sell advisory.',
+      'Solving this frees the scarcest resource in the firm: partner attention, the only hours that can sell advisory.',
   },
 
   closing: {
     // No pull-quote for the accounting edition.
-    reRunNote: 'Re-run every 90 days — and after busy season.',
+    reRunNote: 'Re-run every 90 days, and again after busy season, and compare.',
     ctaText: 'Book your AI Automations Debrief',
     ctaUrl: 'https://link.storyadvantage.co.za/widget/bookings/ai-automations-debrief',
   },

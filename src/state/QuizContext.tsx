@@ -9,24 +9,32 @@ import { DEFAULT_CURRENCY } from '../currency/currency';
 import type { IndustryConfig } from '../config/IndustryConfig';
 import {
   emptyAnswer,
+  emptyQuick,
   type Baseline,
   type LeadDetails,
+  type QuickZoneAnswer,
   type QuizState,
   type Step,
   type ZoneAnswerState,
 } from './types';
 
 type Action =
-  | { type: 'SET_LEAD'; lead: LeadDetails; startedAt: number }
-  | { type: 'MARK_LEAD_CAPTURED' }
+  | { type: 'START'; startedAt: number }
+  | { type: 'SET_LEAD'; lead: LeadDetails; honeypot: string }
   | { type: 'SET_BASELINE'; patch: Partial<Baseline> }
   | { type: 'SET_ANSWER'; zoneId: string; patch: Partial<ZoneAnswerState> }
+  | { type: 'SET_QUICK'; zoneId: string; patch: Partial<QuickZoneAnswer> }
+  | { type: 'SET_QUICK_HOURS'; hours: number }
   | { type: 'GO'; step: Step }
   | { type: 'RESTART' };
 
 function initialState(config: IndustryConfig): QuizState {
   const answers: Record<string, ZoneAnswerState> = {};
-  for (const z of config.zones) answers[z.id] = emptyAnswer();
+  const quick: Record<string, QuickZoneAnswer> = {};
+  for (const z of config.zones) {
+    answers[z.id] = emptyAnswer();
+    quick[z.id] = emptyQuick();
+  }
   return {
     step: 'welcome',
     lead: null,
@@ -37,17 +45,20 @@ function initialState(config: IndustryConfig): QuizState {
       chargeOutRate: null,
     },
     answers,
+    quick,
+    quickHours: null,
     startedAt: null,
-    leadCaptured: false,
+    honeypot: '',
   };
 }
 
 function reducer(state: QuizState, action: Action): QuizState {
   switch (action.type) {
+    case 'START':
+      // Stamp the start time once, when the user begins the quiz.
+      return { ...state, startedAt: state.startedAt ?? action.startedAt };
     case 'SET_LEAD':
-      return { ...state, lead: action.lead, startedAt: action.startedAt };
-    case 'MARK_LEAD_CAPTURED':
-      return { ...state, leadCaptured: true };
+      return { ...state, lead: action.lead, honeypot: action.honeypot };
     case 'SET_BASELINE':
       return { ...state, baseline: { ...state.baseline, ...action.patch } };
     case 'SET_ANSWER':
@@ -58,6 +69,16 @@ function reducer(state: QuizState, action: Action): QuizState {
           [action.zoneId]: { ...state.answers[action.zoneId], ...action.patch },
         },
       };
+    case 'SET_QUICK':
+      return {
+        ...state,
+        quick: {
+          ...state.quick,
+          [action.zoneId]: { ...state.quick[action.zoneId], ...action.patch },
+        },
+      };
+    case 'SET_QUICK_HOURS':
+      return { ...state, quickHours: action.hours };
     case 'GO':
       return { ...state, step: action.step };
     case 'RESTART':
@@ -75,10 +96,12 @@ let contextConfig: IndustryConfig | null = null;
 interface QuizContextValue {
   config: IndustryConfig;
   state: QuizState;
-  setLead: (lead: LeadDetails, startedAt: number) => void;
-  markLeadCaptured: () => void;
+  start: (startedAt: number) => void;
+  setLead: (lead: LeadDetails, honeypot: string) => void;
   setBaseline: (patch: Partial<Baseline>) => void;
   setAnswer: (zoneId: string, patch: Partial<ZoneAnswerState>) => void;
+  setQuick: (zoneId: string, patch: Partial<QuickZoneAnswer>) => void;
+  setQuickHours: (hours: number) => void;
   go: (step: Step) => void;
   restart: () => void;
 }
@@ -99,10 +122,12 @@ export function QuizProvider({
     () => ({
       config,
       state,
-      setLead: (lead, startedAt) => dispatch({ type: 'SET_LEAD', lead, startedAt }),
-      markLeadCaptured: () => dispatch({ type: 'MARK_LEAD_CAPTURED' }),
+      start: (startedAt) => dispatch({ type: 'START', startedAt }),
+      setLead: (lead, honeypot) => dispatch({ type: 'SET_LEAD', lead, honeypot }),
       setBaseline: (patch) => dispatch({ type: 'SET_BASELINE', patch }),
       setAnswer: (zoneId, patch) => dispatch({ type: 'SET_ANSWER', zoneId, patch }),
+      setQuick: (zoneId, patch) => dispatch({ type: 'SET_QUICK', zoneId, patch }),
+      setQuickHours: (hours) => dispatch({ type: 'SET_QUICK_HOURS', hours }),
       go: (step) => dispatch({ type: 'GO', step }),
       restart: () => dispatch({ type: 'RESTART' }),
     }),

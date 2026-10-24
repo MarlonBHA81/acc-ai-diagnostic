@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderReport } from './renderReport';
 import { accountingConfig } from '../config/industries/accounting';
-import { genericConfig } from '../config/industries/generic';
 import type { DiagnosticCompletedEvent, ZoneResult } from '../lib/events';
 
 function zoneRow(zone: string, o: Partial<ZoneResult> = {}): ZoneResult {
@@ -52,27 +51,26 @@ function baseEvent(overrides: Partial<DiagnosticCompletedEvent> = {}): Diagnosti
       zoneRow('Operations'),
       zoneRow('Firm Finance'),
       zoneRow('Team'),
-      zoneRow('Partner/Owner'),
+      zoneRow('Partner / Owner'),
     ],
     ...overrides,
   };
 }
 
 describe('renderReport', () => {
-  it('subjects on the binding constraint with the first name (accounting: "your firm\'s")', () => {
+  it("subjects on the binding constraint (accounting: your firm's)", () => {
     const r = renderReport(baseEvent(), accountingConfig);
     expect(r.subject).toBe("Thabo, your firm's binding constraint is Client Delivery");
   });
 
-  it('prices the constraint in the selected currency (ZAR) as billable-equivalent capacity', () => {
+  it('prices the constraint as billable-equivalent capacity (ZAR), no Simkin quote', () => {
     const r = renderReport(baseEvent(), accountingConfig);
     // 30 hrs × 4.33 × R1000 = 129,900. Separator is ICU-dependent; strip it.
     expect(r.html.replace(/[\s,  ]/g, '')).toContain('R129900/month');
     expect(r.text.replace(/[\s,  ]/g, '')).toContain('R129900/month');
-    // Accounting terminology: suffix present, generic caption absent.
     expect(r.html).toContain('of billable-equivalent capacity');
-    expect(r.text).toContain('of billable-equivalent capacity');
-    expect(r.html).not.toContain('Rough monthly cost of this zone');
+    expect(r.html).not.toMatch(/simkin/i);
+    expect(r.text).not.toMatch(/simkin/i);
   });
 
   it('prices in USD when the baseline currency is USD', () => {
@@ -98,14 +96,6 @@ describe('renderReport', () => {
     expect(r.html).toContain('Download your PDF report');
     expect(r.html).toContain('https://diag.example/r/abc'); // view online
     expect(r.text).toContain('https://diag.example/r/abc?print=1');
-  });
-
-  it('falls back to generic wording when a config omits terminology', () => {
-    const r = renderReport(baseEvent(), genericConfig);
-    expect(r.subject).toMatch(/^Thabo, your binding constraint is /);
-    expect(r.subject).not.toContain("firm's");
-    expect(r.html).toContain('Rough monthly cost of this zone');
-    expect(r.html).not.toContain('billable-equivalent capacity');
   });
 
   it('omits the cost line when no charge-out rate is given', () => {

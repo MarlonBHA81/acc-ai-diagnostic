@@ -1,5 +1,5 @@
 /**
- * IndustryConfig — the single place all vertical copy lives.
+ * IndustryConfig, the single place all vertical copy lives.
  *
  * The scoring engine (src/scoring) and the brand tokens (src/styles/tokens.css)
  * are industry-agnostic. To add a vertical you author one file implementing this
@@ -8,7 +8,7 @@
  * NOTE: the prose in src/config/industries/accounting.ts must be ported VERBATIM
  * from the prototype worksheet `7-zone-diagnostic-accounting-firm.html`. Until the
  * prototype is supplied, that file carries clearly-marked PLACEHOLDER copy so the
- * app compiles and renders — it is not the final wording.
+ * app compiles and renders, it is not the final wording.
  */
 
 import type { AiUsageLevel, MarginImpactLevel } from '../scoring/types';
@@ -95,36 +95,20 @@ export interface NextStepCard {
  * component, so a config that leaves `terminology` off behaves exactly as before.
  */
 export interface Terminology {
-  /**
-   * Caption before the constraint cost calculation on the results screen and in
-   * the email. Default: "Rough monthly cost of this zone:". Set to "" to drop the
-   * caption (the accounting edition leads straight with the calculation).
-   */
+  /** Caption before the constraint cost calc. Default "Rough monthly cost of this zone:". */
   costLinePrefix?: string;
-  /**
-   * Text appended after the constraint cost amount. Default: "" (none).
-   * Accounting uses "of billable-equivalent capacity".
-   */
+  /** Text appended after the constraint cost amount. Default "". Accounting: "of billable-equivalent capacity". */
   costLineSuffix?: string;
-  /**
-   * Report email subject. `{first}` and `{constraint}` are substituted. Default:
-   * "{first}, your binding constraint is {constraint}". Accounting uses
-   * "{first}, your firm's binding constraint is {constraint}".
-   */
-  emailSubjectTemplate?: string;
-  /**
-   * The tip shown in place of the cost line when no charge-out rate was given.
-   * Default: "Tip: add your charge-out rate on the baseline screen to see what
-   * this constraint costs per month."
-   */
+  /** Tip shown when no charge-out rate was given. */
   costLineTip?: string;
+  /** Report email subject; `{first}` and `{constraint}` are substituted. */
+  emailSubjectTemplate?: string;
 }
 
 /**
  * Per-vertical trailing sentences for the three "How the constraint was
- * identified" synthesis cards on the results screen. Each is appended after the
- * shared numeric lead-in (e.g. "30 hrs/week × repetitiveness 5 = 150."). Omitted
- * fields use the generic defaults baked into the results screen.
+ * identified" synthesis cards (full mode). Omitted fields use the generic
+ * defaults baked into the results screen.
  */
 export interface SynthesisCopy {
   /** After Test 1 (volume). Default: "This is where AI saves the most raw hours." */
@@ -133,6 +117,26 @@ export interface SynthesisCopy {
   marginTail?: string;
   /** After Test 3 (partner). Default: "Solving this frees your scarcest resource: leadership attention." */
   partnerTail?: string;
+}
+
+/**
+ * Quick Mode copy: a stripped-down 3-tap-per-zone questionnaire (Yes / Somewhat
+ * / No / Not sure) for a faster, lower-friction diagnostic. Questions use the
+ * placeholder `{zone}`, replaced with the lowercased zone name at render.
+ */
+export interface QuickConfig {
+  /** Short intro line shown on each quick zone screen. */
+  instruction: string;
+  /** The three per-zone questions, each with a `{zone}` placeholder. */
+  questions: {
+    repetitive: string;
+    time: string;
+    aiUsage: string;
+  };
+  /** Prompt for the single hours-band question about the winning zone. */
+  hoursPrompt: string;
+  /** Labels for the three hours bands (Under 5 / 5 to 15 / 15+). */
+  hoursBands: [string, string, string];
 }
 
 export interface IndustryConfig {
@@ -163,27 +167,24 @@ export interface IndustryConfig {
   /** Shared dimension labels/scales. */
   dimensions: DimensionConfig;
 
+  /** Quick Mode copy (optional; required only when the active mode is "quick"). */
+  quick?: QuickConfig;
+
   /** The 7 zones, in display order. */
   zones: ZoneConfig[];
 
   /** Next-step cards keyed to constraint AI level. */
   nextSteps: NextStepConfig;
 
-  /**
-   * Optional per-vertical wording for the shared results/email chrome. Omit to
-   * use the generic defaults (see Terminology).
-   */
+  /** Optional per-vertical wording for shared results/email chrome. */
   terminology?: Terminology;
 
-  /**
-   * Optional per-vertical trailing sentences for the synthesis cards. Omit to use
-   * the generic defaults (see SynthesisCopy).
-   */
+  /** Optional per-vertical synthesis-card trailing sentences (full mode). */
   synthesis?: SynthesisCopy;
 
   /** Closing content on the results screen. */
   closing: {
-    /** Optional pull-quote shown on results + email. Omit to render no quote. */
+    /** Optional pull-quote shown on results. Omit to render no quote. */
     quote?: string;
     /** Attribution for the quote (only used when `quote` is set). */
     quoteAttribution?: string;

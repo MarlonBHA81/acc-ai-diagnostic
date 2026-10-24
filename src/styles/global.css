@@ -1,4 +1,6 @@
 @import './tokens.css';
+/* Per-vertical theme overrides, scoped to [data-vertical="…"] (accounting = ledger look) */
+@import './theme-accounting.css';
 
 * { box-sizing: border-box; }
 
@@ -63,6 +65,19 @@ a { color: var(--sa-accent); }
   font-weight: var(--sa-weight-bold);
 }
 
+.masthead__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.masthead__edition {
+  font-size: var(--sa-text-xs);
+  font-weight: var(--sa-weight-semibold);
+  color: var(--sa-ink-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
 .masthead__step {
   font-size: var(--sa-text-sm);
   font-weight: var(--sa-weight-semibold);
@@ -70,6 +85,7 @@ a { color: var(--sa-accent); }
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+.masthead__step:empty { display: none; }
 
 .main {
   flex: 1;
@@ -125,6 +141,31 @@ a { color: var(--sa-accent); }
 .headline em { color: var(--sa-accent); font-style: normal; }
 .lede { font-size: var(--sa-text-lg); color: var(--sa-ink-soft); }
 .hint { font-size: var(--sa-text-sm); color: var(--sa-ink-faint); }
+
+/* Intro screen bullet list */
+.welcome-points {
+  list-style: none;
+  margin: var(--sa-space-6) 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sa-space-3);
+}
+.welcome-points li {
+  position: relative;
+  padding-left: 1.75rem;
+  font-size: var(--sa-text-base);
+  color: var(--sa-ink);
+}
+.welcome-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: var(--sa-accent);
+}
 
 /* --- Forms --- */
 .field { margin-bottom: var(--sa-space-5); }
@@ -221,7 +262,7 @@ a { color: var(--sa-accent); }
   text-align: center;
 }
 
-/* Honeypot — visually and programmatically hidden from real users. */
+/* Honeypot, visually and programmatically hidden from real users. */
 .hp {
   position: absolute !important;
   left: -9999px !important;
@@ -240,7 +281,7 @@ a { color: var(--sa-accent); }
 }
 
 /* ============================================================================
-   QUIZ COMPONENTS (baseline + zones) — restyled from the prototype to SA tokens
+   QUIZ COMPONENTS (baseline + zones), restyled from the prototype to SA tokens
    ============================================================================ */
 
 /* Zone header */
@@ -294,7 +335,7 @@ a { color: var(--sa-accent); }
 }
 .qblock--unanswered .qblock__label::after { content: " •"; color: var(--sa-error); }
 
-/* Segmented 1–5 scale */
+/* Segmented 1-5 scale */
 .seg { display: flex; gap: var(--sa-space-2); flex-wrap: wrap; }
 .seg__opt {
   flex: 1;
@@ -336,6 +377,34 @@ a { color: var(--sa-accent); }
 .opt-col__opt--sel { border-color: var(--sa-navy); background: var(--sa-accent-soft); }
 .opt-col__opt b { font-weight: var(--sa-weight-bold); }
 .opt-col__opt .sub { display: block; font-size: var(--sa-text-xs); color: var(--sa-ink-soft); margin-top: 2px; }
+
+/* Quick Mode taps (Yes / Somewhat / No / Not sure) */
+.tap-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sa-space-2);
+  margin-top: var(--sa-space-2);
+}
+.tap-col { display: flex; flex-direction: column; gap: var(--sa-space-3); margin-top: var(--sa-space-2); }
+.tap {
+  text-align: center;
+  padding: var(--sa-space-3) var(--sa-space-2);
+  border: 1.5px solid var(--sa-line);
+  background: var(--sa-surface);
+  border-radius: var(--sa-radius-md);
+  font-size: var(--sa-text-sm);
+  font-weight: var(--sa-weight-bold);
+  cursor: pointer;
+  color: var(--sa-ink);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.tap:hover { border-color: var(--sa-ink); }
+.tap--sel { background: var(--sa-navy); border-color: var(--sa-navy); color: #fff; }
+.tap--block { text-align: left; padding: var(--sa-space-4); font-size: var(--sa-text-base); }
+.tap:focus-visible { outline: 3px solid var(--sa-accent-soft); outline-offset: 2px; }
+@media (max-width: 420px) {
+  .tap-row { grid-template-columns: repeat(2, 1fr); }
+}
 
 /* Number input with unit / currency prefix */
 .num-wrap { display: flex; align-items: center; gap: var(--sa-space-3); }
@@ -534,9 +603,13 @@ a { color: var(--sa-accent); }
   background: var(--sa-navy);
   color: #fff;
   text-decoration: none;
+  font-family: inherit;
+  font-size: var(--sa-text-base);
   font-weight: var(--sa-weight-semibold);
   padding: var(--sa-space-3) var(--sa-space-6);
+  border: 0;
   border-radius: var(--sa-radius-md);
+  cursor: pointer;
 }
 .cta-btn:hover { background: var(--sa-navy-hover); }
 
@@ -624,13 +697,62 @@ a { color: var(--sa-accent); }
   padding: var(--sa-space-4) var(--sa-space-6);
 }
 
-.booking-embed {
+/* Centered CTA under the booking card */
+.booking-card__cta {
+  margin-top: var(--sa-space-5);
+  text-align: center;
+}
+
+/* Booking popup (modal) */
+.booking-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sa-space-4);
+  background: rgba(34, 32, 86, 0.55);
+}
+.booking-modal__panel {
+  position: relative;
   width: 100%;
-  min-height: 720px;
+  max-width: 760px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--sa-space-6) var(--sa-space-5) var(--sa-space-5);
+  background: var(--sa-surface);
+  border: 2px solid var(--sa-navy);
+  border-radius: var(--sa-radius-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+.booking-modal__close {
+  position: absolute;
+  top: 6px;
+  right: 14px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--sa-ink-soft);
+}
+.booking-modal__close:hover { color: var(--sa-navy); }
+.booking-modal__frame {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 70vh;
   border: 1px solid var(--sa-line);
   border-radius: var(--sa-radius-md);
-  margin-top: var(--sa-space-5);
   background: var(--sa-surface);
+}
+.booking-modal__link {
+  margin-top: var(--sa-space-3);
+  text-align: center;
+  font-size: var(--sa-text-sm);
+  font-weight: var(--sa-weight-semibold);
+  color: var(--sa-navy);
 }
 
 /* ---- Print / PDF ---- */

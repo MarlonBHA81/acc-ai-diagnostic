@@ -1,6 +1,6 @@
 /**
  * The active vertical for this deployment, chosen by environment variable so the
- * SAME build can power multiple sites (one repo → many editions):
+ * SAME build can power multiple sites (one repo -> many editions):
  *
  *   - Frontend (Vite):        import.meta.env.VITE_VERTICAL
  *   - Serverless (Vercel /    process.env.VERTICAL
@@ -8,19 +8,14 @@
  *
  * THIS REPO IS THE DEDICATED ACCOUNTING FIRM EDITION, so the default vertical is
  * `accounting`: with no env var set, the frontend, API, email, and PDF all render
- * the accounting copy. That means a Vercel project built off this repo ships the
- * accounting edition out of the box — no configuration required. The generic
- * edition is still reachable from the same source by setting the vars to
- * "generic" (that's how the unit tests exercise both). Any unknown value falls
- * back to the default with a console warning.
+ * the accounting copy and the accounting theme. The generic Business Edition is
+ * still reachable from the same source by setting the vars to "generic" (that is
+ * how the unit tests exercise both). Any unknown value falls back to the default
+ * with a console warning.
  *
- * This module is imported by both the app entry (main.tsx, SharedResult.tsx) and
- * the /api/lead handler (handleLead.ts), so the on-screen results, the report
- * email, and the PDF always use the same copy.
- *
- * Available verticals:
- *   - accountingConfig  (Accounting Firm Edition — this repo's default)
- *   - genericConfig     (Generic Business Edition — set VITE_VERTICAL/VERTICAL=generic)
+ * Imported by the app entry (main.tsx, SharedResult.tsx) and the /api/lead handler
+ * (handleLead.ts), so the on-screen results, the report email, and the PDF always
+ * use the same copy.
  */
 import type { IndustryConfig } from './IndustryConfig';
 import { genericConfig } from './industries/generic';
@@ -32,43 +27,30 @@ const VERTICALS: Record<string, IndustryConfig> = {
   accounting: accountingConfig,
 };
 
-// This repo is the dedicated Accounting Firm Edition deployment, so an unset /
-// unknown vertical resolves to accounting (not generic). See the module doc above.
+// Dedicated accounting deployment: unset / unknown resolves to accounting.
 const DEFAULT_VERTICAL = 'accounting';
 
-/**
- * Read the requested vertical from whichever environment is available. In the
- * browser bundle `import.meta.env` is present (Vite) and `process` is not; in the
- * serverless runtime `process.env` is present and `import.meta.env` is not. Both
- * lookups are guarded so this never throws in either context.
- */
 function readRequestedVertical(): string | undefined {
-  // Frontend build: Vite statically replaces this exact expression with the
-  // literal value at build time, so no `import.meta.env` object is touched at
-  // runtime. In the serverless build (esbuild), the expression survives to
-  // runtime where `import.meta.env` is undefined — the try/catch swallows that
-  // and we fall through to process.env below.
+  // Frontend build: Vite statically replaces this exact expression at build time.
+  // In the serverless build (esbuild) the expression survives to runtime where
+  // `import.meta.env` is undefined; the try/catch swallows that and we fall
+  // through to process.env below.
   try {
     const fromVite = import.meta.env.VITE_VERTICAL;
     if (fromVite) return fromVite;
   } catch {
-    /* not a Vite context — fall through to process.env */
+    /* not a Vite context */
   }
-
-  // Serverless functions (Vercel / Cloudflare) read plain process.env.
   if (typeof process !== 'undefined' && process.env && process.env.VERTICAL) {
     return process.env.VERTICAL;
   }
-
   return undefined;
 }
 
-/** Resolve the requested vertical to a config, falling back to generic. */
 function resolveActiveConfig(): IndustryConfig {
   const requested = readRequestedVertical();
   const key = (requested ?? DEFAULT_VERTICAL).trim().toLowerCase();
   const config = VERTICALS[key];
-
   if (!config) {
     // eslint-disable-next-line no-console
     console.warn(
@@ -77,9 +59,20 @@ function resolveActiveConfig(): IndustryConfig {
     );
     return VERTICALS[DEFAULT_VERTICAL];
   }
-
   return config;
 }
 
 /** The resolved config for this deployment. Import this everywhere. */
 export const activeConfig: IndustryConfig = resolveActiveConfig();
+
+/**
+ * Which questionnaire this deployment serves:
+ *   - 'full'  the original 7-zone x 5-dimension diagnostic (the accounting prototype)
+ *   - 'quick' the fast 3-tap-per-zone version (Yes / Somewhat / No / Not sure)
+ *
+ * The Accounting Firm Edition ships the FULL diagnostic to match the prototype
+ * worksheet and showcase the firm-specific dimension copy. Switch to 'quick' here
+ * to match the live Business edition's fast flow; the active vertical already
+ * provides a `quick` block.
+ */
+export const activeMode: 'full' | 'quick' = 'full';

@@ -1,0 +1,117 @@
+/*
+ * ============================================================================
+ *  ACCOUNTING FIRM EDITION THEME  (scoped: [data-vertical="accounting"])
+ * ============================================================================
+ *  Re-skins the shared, token-driven UI into the prototype's "ledger" identity:
+ *  warm paper background, near-black ink, ledger-green accent, a single signal-red
+ *  highlight for the binding constraint, and monospace for the small uppercase
+ *  labels. Nothing here touches the generic Business Edition, which keeps the
+ *  Story Advantage navy/yellow system from tokens.css.
+ *
+ *  Prototype palette:
+ *    paper #FAFAF7 · ink #14171C · ledger green #1B5E4A · signal red #C22E1F
+ * ============================================================================
+ */
+
+:root[data-vertical="accounting"] {
+  /* Surfaces + ink (warm paper, near-black ink) */
+  --sa-bg: #fafaf7;
+  --sa-bg-subtle: #efefea;
+  --sa-surface: #ffffff;
+  --sa-ink: #14171c;
+  --sa-ink-soft: #4a5058;
+  --sa-ink-faint: #8a9099;
+  --sa-line: #ddded8;
+
+  /* Structural "dark" role (borders, selected chips, stamp, section rules) = ink */
+  --sa-navy: #14171c;
+  --sa-navy-hover: #2a2f38;
+  --sa-navy-deep: #0d0f13;
+
+  /* Accent = ledger green (eyebrows, links, CTAs, bars, selected-option tint) */
+  --sa-accent: #1b5e4a;
+  --sa-accent-hover: #174e3e;
+  --sa-accent-contrast: #ffffff;
+  --sa-accent-soft: #e7f1ec;
+
+  /* Highlight = signal red (binding-constraint elements only) */
+  --sa-yellow: #c22e1f;
+  --sa-yellow-soft: #fbe9e6;
+  --sa-yellow-line: #a52618;
+  --sa-alert: #c22e1f;
+  --sa-alert-soft: #fbe9e6;
+  --sa-alert-line: #a52618;
+  --sa-alert-ink: #ffffff;
+
+  /* Focus rings tuned to the green accent */
+  --sa-focus: #1b5e4a;
+  --sa-focus-on-navy: #e3b7b1;
+
+  /* Ledger monospace for small uppercase labels */
+  --sa-font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo,
+    Consolas, monospace;
+}
+
+/* --- Monospace "ledger" labels --- */
+[data-vertical="accounting"] .eyebrow,
+[data-vertical="accounting"] .zone-eyebrow,
+[data-vertical="accounting"] .verdict-eyebrow,
+[data-vertical="accounting"] .sec-title,
+[data-vertical="accounting"] .stamp,
+[data-vertical="accounting"] .seg__opt,
+[data-vertical="accounting"] .seg__cap,
+[data-vertical="accounting"] .bars__score,
+[data-vertical="accounting"] .rtable th,
+[data-vertical="accounting"] .syn__k,
+[data-vertical="accounting"] .next-card__k,
+[data-vertical="accounting"] .notes__zone,
+[data-vertical="accounting"] .masthead__step,
+[data-vertical="accounting"] .masthead__edition,
+[data-vertical="accounting"] .nav-note,
+[data-vertical="accounting"] .cost-line,
+[data-vertical="accounting"] .booking-card__badge,
+[data-vertical="accounting"] .currency-seg__code {
+  font-family: var(--sa-font-mono);
+}
+
+/* --- Masthead: firm "ledger" rule under the brand --- */
+[data-vertical="accounting"] .masthead {
+  border-bottom: 2px solid var(--sa-ink);
+}
+
+/* --- Headline accent in ledger green --- */
+[data-vertical="accounting"] .headline em,
+[data-vertical="accounting"] .headline strong {
+  color: var(--sa-accent);
+  font-style: normal;
+}
+
+/* --- Bars: green fill for normal zones, signal red for the constraint --- */
+[data-vertical="accounting"] .bars__fill {
+  background: var(--sa-accent);
+}
+[data-vertical="accounting"] .bars__row--constraint .bars__fill {
+  background: var(--sa-alert);
+}
+[data-vertical="accounting"] .bars__row--constraint .bars__name {
+  color: var(--sa-alert);
+}
+
+/* --- Constraint row in the summary table: red ink on soft-red --- */
+[data-vertical="accounting"] .rtable tr.constraint td:first-child {
+  color: var(--sa-alert);
+}
+
+/* --- Verdict + results stamp lean on the red signal --- */
+[data-vertical="accounting"] .stamp {
+  color: var(--sa-alert);
+  border-color: var(--sa-alert);
+}
+
+/* --- Primary booking CTA in ledger green (matches .btn--primary accent) --- */
+[data-vertical="accounting"] .cta-btn {
+  background: var(--sa-accent);
+}
+[data-vertical="accounting"] .cta-btn:hover {
+  background: var(--sa-accent-hover);
+}
